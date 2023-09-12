@@ -1,3 +1,5 @@
+use censor::*;
+
 fn div_rem<T: std::ops::Div<Output=T> + std::ops::Rem<Output=T> + Copy>(x: T, y: T) -> (T, T) {
     let quot = x / y;
     let rem = x % y;
@@ -75,8 +77,13 @@ fn test_to_int_1() {
 }
 
 fn next(last: String, valid_chars: &str, digits: usize) -> String {
+    let censor = Censor::Standard + Censor::Sex + Censor::Zealous;
     let next_val = from_int(to_int(last, valid_chars) + 1, valid_chars);
-    pad_to_length(next_val, digits, valid_chars.chars().nth(0).unwrap())
+    let next_val = pad_to_length(next_val, digits, valid_chars.chars().nth(0).unwrap());
+    match censor.check(&next_val) {
+        true => next(next_val, valid_chars, digits),
+        false => next_val
+    }
 }
 
 fn main() {
