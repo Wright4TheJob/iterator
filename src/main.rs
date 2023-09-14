@@ -1,4 +1,5 @@
 use censor::*;
+use std::env;
 
 fn div_rem<T: std::ops::Div<Output=T> + std::ops::Rem<Output=T> + Copy>(x: T, y: T) -> (T, T) {
     let quot = x / y;
@@ -86,14 +87,50 @@ fn next(last: String, valid_chars: &str, digits: usize) -> String {
     }
 }
 
+fn is_valid_char(ch: char, valid_chars: &str) -> bool {
+    match valid_chars.find(ch) {
+        Some(_) => true,
+        None => false,
+    }
+}
+
+fn is_valid_id(id: &str, valid_chars: &str) -> bool {
+    let mut is_valid = true;
+    for ch in id.chars() {
+        is_valid = is_valid && is_valid_char(ch, valid_chars);
+    };
+    is_valid
+}
+
 fn main() {
     let valid_chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
-    let mut i = 1;
-    let mut last_id = String::from("AAAA");
-    println!("{}",last_id);
-    while i < 100 {
-        last_id = next(last_id.clone(), valid_chars, 4);
-        println!("{}",last_id);
-        i += 1;
+    // let mut i = 1;
+    // let mut last_id = String::from("AAAA");
+    // println!("{}",last_id);
+    // while i < 100 {
+    //     last_id = next(last_id.clone(), valid_chars, 4);
+    //     println!("{}",last_id);
+    //     i += 1;
+    // }
+
+    let mut num_to_print = 1;
+    if let Some(arg2) = env::args().nth(2) {
+        if let Ok(num) = arg2.trim().parse() {
+            num_to_print = num;
+        };
     }
+
+    let mut i = 0;
+    if let Some(arg1) = env::args().nth(1) {
+        match is_valid_id(&arg1, valid_chars) {
+            true => {
+                while i < num_to_print {
+                    println!("{}", next(arg1.clone(), valid_chars, arg1.len()));
+                    i = i + 1;
+                }
+            },
+            false => println!("ID contains illegal characters.")
+        }
+    }
+
 }
